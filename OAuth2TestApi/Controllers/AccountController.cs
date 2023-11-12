@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace OAuth2TestApi.Controllers;
 [ApiController]
-[Route("api/[controller]")]
-[AllowAnonymous]
+[AllowAnonymous,Route("account")]
+[Route("api/account")]
 public class AccountController:ControllerBase
 {
-    [HttpGet]
     [Route("google-login")]
+    [HttpGet]
     public IActionResult GoogleLogin()
     {
         var properties = new AuthenticationProperties
@@ -20,6 +20,15 @@ public class AccountController:ControllerBase
             RedirectUri = Url.Action("GoogleResponse")
         };
         return Challenge(properties,GoogleDefaults.AuthenticationScheme);
+    }
+    
+    [Route("google-logout")]
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> GoogleLogout()
+    {
+        await HttpContext.SignOutAsync();
+        return Redirect("/");
     }
 
     public async Task<IActionResult> GoogleResponse()
